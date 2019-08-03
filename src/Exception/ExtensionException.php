@@ -2,8 +2,8 @@
 
 namespace Encrypt\Exception;
 
-use \Exception;
+use Exception;
 
-class ExtensionException extends Exception{
+class ExtensionNotExistException extends Exception{
 
 }

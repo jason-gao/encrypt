@@ -2,7 +2,7 @@
 
 namespace Encrypt;
 
-use Encrypt\Exception\ExtensionException;
+use Encrypt\Exception\CipherMethodNotSupportException;
 
 class AES_OpenSsl
 {
@@ -14,21 +14,23 @@ class AES_OpenSsl
 
     private $options;
 
-    public function __construct($key, $method = 'AES-128-ECB', $iv = '', $options = 0)
+    public function __construct($key = 'json-gao', $method = 'AES-128-ECB', $options = 0)
     {
-        $this->checkEnv();
-        $this->secret_key = isset($key) ? $key : 'json-gao';
-        $this->method     = $method;
-        $this->iv         = $iv;
-        $this->options    = $options;
+        Common::checkOpenSSl();
+        $this->secret_key = $key;
+        $methods          = openssl_get_cipher_methods();
+        if (!in_array($method, $methods)) {
+            throw new CipherMethodNotSupportException("cipher [$method] not support, support methods: " . implode("\t", $methods));
+        }
+        $this->method = $method;
+        $ivLen        = openssl_cipher_iv_length($method);
+        $this->iv     = openssl_random_pseudo_bytes($ivLen);
+        if (!$this->iv) {
+            $this->iv = '';
+        }
+        $this->options = $options;
     }
 
-    private function checkEnv()
-    {
-        if (!extension_loaded('openssl')) {
-            throw new ExtensionException('openssl extension not install!!');
-        }
-    }
 
     public function encrypt($data)
     {
