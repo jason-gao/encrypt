@@ -11,10 +11,10 @@ class EncryptTest extends TestCase
 
     public function testAesOpenssl()
     {
-        $data = [1, 2, 3, time()];
-        $d    = json_encode($data);
+        $data = 'my message';
+        $d    = is_array($data) ? json_encode($data) : $data;
         var_dump("d\t$d");
-        $key = 'abc#123*?(JmMrA2vN6EJhrvdVZbxaQs5jpSe34X3ejFK)';
+        $key = 'secret key 123';
         //数据很小，尤其是16字节一下ecb，数据量大的用cbc
 //        $method = 'AES-128-ECB';
 //        $method = 'AES-256-ECB';
@@ -22,6 +22,7 @@ class EncryptTest extends TestCase
         $method = 'AES-256-CBC';
         var_dump("method\t$method");
         $aes = new AES_OpenSsl($key, $method);
+        $aes->setIv(str_repeat(1, 16));
 
         //en
         $enc = $aes->encrypt($d);
@@ -30,9 +31,7 @@ class EncryptTest extends TestCase
         //de
         $deEncData = $aes->decrypt($enc);
         var_dump("deEncData\t$deEncData\n");
-        $this->assertEquals(1, json_decode($deEncData, 1)[0]);
-        $this->assertEquals(2, json_decode($deEncData, 1)[1]);
-        $this->assertEquals(3, json_decode($deEncData, 1)[2]);
+        $this->assertEquals('my message', $deEncData);
     }
 
     public function testRc4()
