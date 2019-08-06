@@ -36,19 +36,19 @@ class EncryptTest extends TestCase
 
     public function testRc4()
     {
-        $key        = "0123456789abcdef";
-        $plaintext  = "Hello World!#*.&@()+-";
+        $key        = "Secret Passphrase";
+        $plaintext  = "Message";
         $cipherText = Rc4::rc4($key, $plaintext);
         $decrypted  = Rc4::rc4($key, $cipherText);
-        echo "\n" . $decrypted . " - " . $plaintext . "\n";
+        echo "\ncipherText-" . base64_encode($cipherText) . "\tdecrypted-" . $decrypted . "\tplaintext-" . $plaintext . "\n";
 
         $this->assertEquals($plaintext, $decrypted);
     }
 
     public function testRc4CStyle()
     {
-        $key        = "0123456789abcdef";
-        $plaintext  = "Hello World!#*.&@()+-";
+        $key        = "Secret Passphrase";
+        $plaintext  = "Message";
         $cipherText = Rc4::rc4CStyle($key, $plaintext);
         $decrypted  = Rc4::rc4CStyle($key, $cipherText);
         echo "\n" . $decrypted . " - " . $plaintext . "\n";
@@ -59,23 +59,22 @@ class EncryptTest extends TestCase
     public function testRasOpenssl()
     {
         $key = Rsa_OpenSsl::makePubPriKey();
-//        var_dump($key);
 
         $rsa  = new Rsa_OpenSsl($key['publicKey'], $key['privateKey']);
         $data = "hello中国";
         //公钥加密
         $encPub = $rsa->publicEncrypt($data);
-        var_dump("encPub\t$encPub");
+        var_dump("\nencPub\t$encPub");
         //私钥解密
         $dePri = $rsa->privateDecrypt($encPub);
-        var_dump("dePri\t$dePri");
+        var_dump("\ndePri\t$dePri");
 
         //私钥加密
         $encPri = $rsa->privateEncrypt($data);
-        var_dump("encPri\t$encPri");
+        var_dump("\nencPri\t$encPri");
         //公钥解密
         $dePub = $rsa->publicDecrypt($encPri);
-        var_dump("dePub\t$dePub");
+        var_dump("\ndePub\t$dePub");
 
     }
 }
